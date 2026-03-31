@@ -1,0 +1,24 @@
+{
+    "Header": {
+        "Comment": "All values are metric (mm)",
+        "CreationDate": "2026-03-03T21:24:13Z",
+        "GenerationSoftware": {
+            "Application": "Fusion Electronics",
+            "Vendor": "Autodesk",
+            "Version": "9.7.0"
+        },
+        "Part": "Single"
+    },
+    "Overall": {
+        "BoardThickness": 1.6608,
+        "LayerNumber": 2,
+        "Name": {
+            "ProjectId": "whirly_bird_v4"
+        },
+        "Owner": "Orion Dobos <dobos@asu.edu>",
+        "Size": {
+            "X": 62.365141,
+            "Y": 60
+        }
+    }
+}
