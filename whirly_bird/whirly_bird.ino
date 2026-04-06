@@ -50,11 +50,43 @@ static const char *htmlContent PROGMEM = R"(
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>whirly bird</title>
   <link rel="stylesheet" href="	https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+  <style>
+      body {
+          font-family: monospace;
+          text-align: center;
+          margin-top: 50px;
+      }
+      h1 {
+          font-family:  monospace;
+      }
+      h2 {
+          font-family: monospace;
+          font-size: large;
+      }
+      .button-row {
+          display: flex;
+          gap: 10px;
+          justify-content: center;
+      }
+      .button-row button {
+          padding: 10px 16px;
+          border: none;
+          background-color: cornflowerblue;
+          color: white;
+          font-family: monospace;
+          cursor: pointer;
+          border-radius: 6px;
+      }
+      .button-row button:hover {
+          background-color: darkslategray;
+      }
+  </style>
 </head>
 <body>
   <h1>Whirly Bird Web Server</h1>
+  <div class="h2" id="indicatorContainer"></div>
   <br><br>
-  <div class="row" id="buttonContainer"></div>
+  <div class="button-row" id="buttonContainer"></div>
   <script>
     var ws = new WebSocket('ws://192.168.4.1/ws');
     ws.onopen = function() {
@@ -76,52 +108,58 @@ static const char *htmlContent PROGMEM = R"(
         angle: 0
       },
       ch2: {
-        label: "Benzaldehyde",
+        label: "Odor #1",
         angle: 90
       },
       ch3: {
-        label: "Geosmin",
+        label: "Odor #2",
         angle: 180
       },
       ch4: {
-        label: "D-Limonene",
+        label: "Odor #3",
         angle: 270
       }
     }
 
+    function createChannelIndicator() {
+        const container = document.getElementById('indicatorContainer');
+
+        const openIndicator = document.createElement('h2');
+        openIndicator.id = 'openIndicator';
+        openIndicator.textContent = "Current Channel: Clean Air";
+        container.appendChild(openIndicator);
+    }
+
     function createButtons() {
       const container = document.getElementById('buttonContainer');
-      const onClass = 'btn btn-success btn-block mb-2';
-      const offClass = 'btn btn-danger btn-block';
       
       for (const key in setup) {
         if(key.startsWith('ch')) {
           const column = document.createElement('div');
-          column.className = 'col-md-3';
+          column.className = 'button-row';
 
           const button = document.createElement('button');
-          button.className = offClass;
+          button.className = 'button';
           button.textContent = setup[key].label;
-          let on = false;
 
           button.addEventListener('click', function() {
-            on = !on;
-            button.className = (on ? onClass : offClass);
-            
             var m1 = "MOTOR " + setup[key].angle;
             var m2 = "FAN " + 255;
             ws.send(m1);
             ws.send(m2);
+
+            document.getElementById('openIndicator').textContent = "Current Channel: " + setup[key].label;
 
             console.log("websocket sent: " + m1);
             console.log("websocket sent: " + m2);
           });
 
           column.appendChild(button);
-          container.appendChild(button);
+          container.appendChild(column);
         }
       }
     }
+    createChannelIndicator();
     createButtons();
 
     setInterval(function() {
