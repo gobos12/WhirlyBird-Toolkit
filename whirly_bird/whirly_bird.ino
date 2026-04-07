@@ -108,15 +108,15 @@ static const char *htmlContent PROGMEM = R"(
         angle: 0
       },
       ch2: {
-        label: "Odor #1",
+        label: "Odor #1",                       /* UPDATE ODORANT #1 */
         angle: 90
       },
       ch3: {
-        label: "Odor #2",
+        label: "Odor #2",                       /* UPDATE ODORANT #2 */
         angle: 180
       },
       ch4: {
-        label: "Odor #3",
+        label: "Odor #3",                       /* UPDATE ODORANT #3 */
         angle: 270
       }
     }
@@ -132,6 +132,8 @@ static const char *htmlContent PROGMEM = R"(
 
     function createButtons() {
       const container = document.getElementById('buttonContainer');
+
+      let timer = null;  // fan turn-off timer
       
       for (const key in setup) {
         if(key.startsWith('ch')) {
@@ -150,8 +152,22 @@ static const char *htmlContent PROGMEM = R"(
 
             document.getElementById('openIndicator').textContent = "Current Channel: " + setup[key].label;
 
-            console.log("websocket sent: " + m1);
-            console.log("websocket sent: " + m2);
+            // if clean air channel selected, turn the fan off after 15 seconds to conserve battery power
+            if (timer !== null) {
+              clearInterval(timer);
+              timer = null;
+            }
+            if (setup[key].label === "Clean Air") {
+              let timeLeft = 15;
+              timer = setInterval(() => {
+                timeLeft--;
+                if (timeLeft < 0) {
+                  clearInterval(timer);
+                  ws.send("FAN " + 0);
+                }
+              }, 1000);
+            }
+
           });
 
           column.appendChild(button);
